@@ -1,3 +1,8 @@
+import os
+
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 TARGET_COL = "events"
 
 NEEDED_COLS = [
@@ -23,12 +28,26 @@ NEEDED_COLS = [
 IDENTITY_COLS = [
     'batter',
     'pitcher',
-    'description',
-    'game_type',
-    'stand',
-    'p_throws',
+    'game_date',
+    #'description',
+    #'game_type',
+    #'stand',
+    #'p_throws',
     'outs_when_up',
     'inning',
     'inning_topbot',
-    'game_pk',
+    #'game_pk',
 ]
+
+STATS_TO_EVENTS = {
+    "1B": "s",
+    "2B": "d",
+    "3B": "t",
+    "HR": "hr",
+    "BB": "w",
+    "SO": "so",
+    "DP": "dp",
+    "FO": "fo",
+    "SF": "sf",
+    "SH": "sh",
+}
