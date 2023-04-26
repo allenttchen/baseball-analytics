@@ -1,17 +1,16 @@
-from datetime import datetime, date
+from datetime import date
 
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LogisticRegression
 
 from .preprocessors import ToDatetime
-from .transformers import (
+from src.modeling.transformers.transformers import (
     ComputeDaysSinceStart,
     ComputeNetScore,
     EncodeOnBaseOccupancy,
     Identity,
-    MovingAverage,
 )
+from src.modeling.transformers.movingaverage import MovingAverage
 from .constants import IDENTITY_COLS
 
 
@@ -45,16 +44,16 @@ feature_transformers = ColumnTransformer(
         (
             "batter_365_days_ma",
             MovingAverage(
-                output_cols=["1B_perc", "2B_perc", "3B_perc", "HR_perc", "BB_perc", "SO_perc", "DP_perc", "FO_perc", "SF_perc", "SH_perc"],
+                output_cols=["1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV"],
                 player_type="batter",
                 ma_days=365,
-                stats_to_compute=["1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "SF", "SH"],
+                stats_to_compute=["1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV"],
                 head_to_head=False,
                 training_data_start_date=date(2022, 4, 7),
                 training_data_end_date=date(2023, 4, 17),
                 ma_start_date=date(2023, 4, 7), # datetime(2022, 4, 7) + timedelta(365)
             ),
-            ["game_date", "batter", ]
+            ["game_date", "batter", "launch_speed", ]
         )
     ],
     remainder='drop',

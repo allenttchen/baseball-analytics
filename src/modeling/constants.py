@@ -48,6 +48,19 @@ STATS_TO_EVENTS = {
     "SO": "so",
     "DP": "dp",
     "FO": "fo",
+    "HBP": "hbp",
     "SF": "sf",
     "SH": "sh",
+    "wOBA": ["w", "hbp", "s", "d", "t", "hr"],
+    "mEV": "not none",
+    "aEV": "not none",
+}
+
+WOBA_FACTORS = {
+    "w": 0.702,
+    "hbp": 0.733,
+    "s": 0.892,
+    "d": 1.261,
+    "t": 1.593,
+    "hr": 2.039,
 }
