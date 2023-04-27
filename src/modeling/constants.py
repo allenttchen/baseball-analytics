@@ -31,8 +31,8 @@ IDENTITY_COLS = [
     'game_date',
     #'description',
     #'game_type',
-    #'stand',
-    #'p_throws',
+    'stand',
+    'p_throws',
     'outs_when_up',
     'inning',
     'inning_topbot',
@@ -40,6 +40,7 @@ IDENTITY_COLS = [
 ]
 
 STATS_TO_EVENTS = {
+    "PA": "pa",
     "1B": "s",
     "2B": "d",
     "3B": "t",
@@ -54,6 +55,8 @@ STATS_TO_EVENTS = {
     "wOBA": ["w", "hbp", "s", "d", "t", "hr"],
     "mEV": "not none",
     "aEV": "not none",
+    "pwOBA": ["w", "hbp", "s", "d", "t", "hr"],
+    "pPA": "ppa",
 }
 
 WOBA_FACTORS = {

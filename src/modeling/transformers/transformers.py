@@ -9,7 +9,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OrdinalEncoder
 
-from src.modeling._abstract_bases import TransformerBase
+from .._abstract_bases import TransformerBase
 
 
 class Identity(BaseEstimator, TransformerMixin, TransformerBase):
