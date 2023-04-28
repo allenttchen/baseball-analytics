@@ -11,6 +11,7 @@ from .transformers.transformers import (
     Identity,
 )
 from .transformers.movingaverage import MovingAverage
+from .transformers.headtohead import HeadToHead
 from .constants import IDENTITY_COLS
 
 
@@ -48,13 +49,59 @@ feature_transformers = ColumnTransformer(
                 player_type="batter",
                 ma_days=365,
                 stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV", "pwOBA", "pPA"],
-                head_to_head=False,
                 training_data_start_date=date(2022, 4, 7),
                 training_data_end_date=date(2023, 4, 17),
                 ma_start_date=date(2023, 4, 7), # datetime(2022, 4, 7) + timedelta(365)
             ),
             ["game_date", "batter", "launch_speed", "p_throws", ],
         ),
+        # (
+        #     "pitcher_365_days_ma",
+        #     MovingAverage(
+        #         output_cols=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV", "pwOBA", "pPA"],
+        #         player_type="pitcher",
+        #         ma_days=365,
+        #         stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV", "pwOBA", "pPA"],
+        #         training_data_start_date=date(2022, 4, 7),
+        #         training_data_end_date=date(2023, 4, 17),
+        #         ma_start_date=date(2023, 4, 7), # datetime(2022, 4, 7) + timedelta(365)
+        #     ),
+        #     ["game_date", "pitcher", "launch_speed", "stand", ],
+        # ),
+        # (
+        #     "batter_30_days_ma",
+        #     MovingAverage(
+        #         output_cols=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"],
+        #         player_type="batter",
+        #         ma_days=30,
+        #         stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"],
+        #         training_data_start_date=date(2022, 4, 7),
+        #         training_data_end_date=date(2023, 4, 17),
+        #         ma_start_date=date(2022, 5, 7), # datetime(2022, 4, 7) + timedelta(30)
+        #     ),
+        #     ["game_date", "batter", "launch_speed", "p_throws", ],
+        # ),
+        # (
+        #     "pitcher_30_days_ma",
+        #     MovingAverage(
+        #         output_cols=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"],
+        #         player_type="pitcher",
+        #         ma_days=30,
+        #         stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"],
+        #         training_data_start_date=date(2022, 4, 7),
+        #         training_data_end_date=date(2023, 4, 17),
+        #         ma_start_date=date(2022, 5, 7), # datetime(2022, 4, 7) + timedelta(30)
+        #     ),
+        #     ["game_date", "pitcher", "launch_speed", "stand", ],
+        # ),
+        (
+            "head_to_head",
+            HeadToHead(
+                output_cols=["1B", "2B", "HR", "BB", "SO"],
+                stats_to_compute=["1B", "2B", "HR", "BB", "SO"],
+            ),
+            ["batter", "pitcher", ]
+        )
     ],
     remainder='drop',
 )
@@ -63,6 +110,6 @@ feature_transformers = ColumnTransformer(
 data_pipeline = Pipeline(
     [
         ("preprocessors", preprocessors),
-        ("feature_transformers", feature_transformers),\
+        ("feature_transformers", feature_transformers),
     ]
 )

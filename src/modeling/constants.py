@@ -1,7 +1,10 @@
 import os
+import uuid
 
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+#UNIQUE_RUN_ID = str(uuid.uuid4())
+UNIQUE_RUN_ID = str(000)
 
 TARGET_COL = "events"
 

@@ -3,13 +3,12 @@ from typing import List
 import functools
 import os
 import glob
-import uuid
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from .._abstract_bases import TransformerBase
-from ..constants import STATS_TO_EVENTS, ROOT_DIR, WOBA_FACTORS
+from ..constants import STATS_TO_EVENTS, ROOT_DIR, WOBA_FACTORS, UNIQUE_RUN_ID
 
 
 class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
@@ -21,7 +20,6 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
         player_type: str,
         ma_days: int,
         stats_to_compute: List[str],
-        head_to_head: bool,
         training_data_start_date: date,
         training_data_end_date: date,
         ma_start_date: date
@@ -31,7 +29,6 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
         self.player_type = player_type
         self.ma_days = ma_days
         self.stats_to_compute = stats_to_compute # col names to self.ma_stats_df
-        self.head_to_head = head_to_head
         self.ma_stats_df = pd.DataFrame() # ma for all players of all stats in df
         self.training_data_start_date = training_data_start_date
         self.training_data_end_date = training_data_end_date
@@ -39,6 +36,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
         self.feature_names_out = output_cols
         self.pa_ts = None
         self.opp_player_type_handedness_col = None
+        self.saved_file_name = None
 
     def fit(self, X: pd.DataFrame, y: pd.Series = None):
         """Computes moving average for all players' all stats starting from mv_start_date to today"""
@@ -63,10 +61,10 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
         # {
         #   player: {
         #       1B%: [v0, v1, ...],
-        intermediate_path = os.path.join(ROOT_DIR, "intermediate")
+        intermediate_path = os.path.join(ROOT_DIR, "intermediate", str(date.today()) + "-" + UNIQUE_RUN_ID)
         os.makedirs(intermediate_path, exist_ok=True)
-        unique_file_id = str(uuid.uuid4())
-        intermediate_path_file = os.path.join(intermediate_path, str(date.today()) + "-" + unique_file_id + ".json")
+        self.saved_file_name = self.player_type + "-" + str(self.ma_days) + ".json"
+        intermediate_path_file = os.path.join(intermediate_path, self.saved_file_name)
         self.ma_stats_df.to_json(intermediate_path_file, orient="index", indent=4)
         return self
 
@@ -74,8 +72,9 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
         """Retrieve moving average for each requested stat"""
         if self.ma_stats_df.empty:
             intermediate_path = os.path.join(ROOT_DIR, "intermediate", "*")
-            all_files = glob.glob(intermediate_path)
-            latest_file = max(all_files,  key=os.path.getctime)
+            all_folders = glob.glob(intermediate_path)
+            latest_folder = max(all_folders,  key=os.path.getctime)
+            latest_file = os.path.join(latest_folder, self.saved_file_name)
             self.ma_stats_df = pd.read_json(latest_file)
 
         for output_col, stat in zip(self.output_cols, self.stats_to_compute):
@@ -145,7 +144,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
             # check computed vs inputed moving average start date
             computed_ma_start_date = stat_ma.index[self.ma_days]
             assert (computed_ma_start_date.date() == self.ma_start_date)
-            stat_ma_lst = stat_ma.tolist()[365:]
+            stat_ma_lst = stat_ma.tolist()[self.ma_days:]
             stat_ma_mapping[stat] = stat_ma_lst
             del player_event_group
 
@@ -153,7 +152,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
             if stat in ["pPA", "pwOBA"]:
                 computed_ma_start_date2 = stat_ma2.index[self.ma_days]
                 assert (computed_ma_start_date2.date() == self.ma_start_date)
-                stat_ma_lst2 = stat_ma2.tolist()[365:]
+                stat_ma_lst2 = stat_ma2.tolist()[self.ma_days:]
                 stat_ma_mapping["R"+stat] = stat_ma_lst2
                 del player_event_group2
                 del player_group1
