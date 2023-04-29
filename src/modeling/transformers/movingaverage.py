@@ -269,7 +269,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
         if stat in ["pwOBA", "pPA"] and opp_player_type_handedness == "R":
             stat = "R"+stat
         # guardrail for dates before ma_start_Date
-        if date_index < 0:
+        if date_index < 0 or player not in self.ma_stats_df.index:
             return 0
         stat_ma = self.ma_stats_df.loc[(self.ma_stats_df.index == player), stat].values[0][date_index]
         return stat_ma

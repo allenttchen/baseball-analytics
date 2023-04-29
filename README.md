@@ -27,8 +27,8 @@ Model: Neural Network with Pytorch
   - Average wOBA [done]
 - Batter and Pitcher head-to-head all-time
   - Rates per PA for 1B, 2B, HR, BB, SO [done]
-  - Average wOBA
-  - Number of appearances
+  - Average wOBA [done]
+  - Number of appearances [done]
 - Ballpark
   - Park factors for 1B, 2B, 3B, HR, BB
 - Game state

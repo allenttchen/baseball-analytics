@@ -97,8 +97,8 @@ feature_transformers = ColumnTransformer(
         (
             "head_to_head",
             HeadToHead(
-                output_cols=["1B", "2B", "HR", "BB", "SO"],
-                stats_to_compute=["1B", "2B", "HR", "BB", "SO"],
+                output_cols=["1B", "2B", "HR", "BB", "SO", "PA", "wOBA"],
+                stats_to_compute=["1B", "2B", "HR", "BB", "SO", "PA", "wOBA"],
             ),
             ["batter", "pitcher", ]
         )
