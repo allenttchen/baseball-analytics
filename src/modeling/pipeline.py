@@ -109,9 +109,9 @@ feature_transformers = ColumnTransformer(
             ParkFactor(
                 output_cols=["1B", "2B", "3B", "HR", "BB"],
                 stats_to_compute=["1B", "2B", "3B", "HR", "BB"],
-                park_factors_file_path=os.path.join(ROOT_DIR, "intermediate/park_factors.csv"),
+                park_factors_file_path=os.path.join(ROOT_DIR, "intermediate/park_factors.json"),
             ),
-            ["home_team", ],
+            ["home_team", "game_year", ],
         ),
     ],
     remainder='drop',

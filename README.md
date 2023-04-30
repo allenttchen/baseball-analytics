@@ -30,7 +30,7 @@ Model: Neural Network with Pytorch
   - Average wOBA [done]
   - Number of appearances [done]
 - Ballpark
-  - Park factors for 1B, 2B, 3B, HR, BB
+  - Park factors for 1B, 2B, 3B, HR, BB [done]
 - Game state
   - Outs [done]
   - Innings [done]
