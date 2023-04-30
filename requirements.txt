@@ -5,3 +5,5 @@ seaborn
 jupyterlab
 ipykernel
 scikit-learn
+requests
+beautifulsoup4

@@ -40,6 +40,7 @@ IDENTITY_COLS = [
     'inning',
     'inning_topbot',
     #'game_pk',
+    'home_team',
 ]
 
 STATS_TO_EVENTS = {

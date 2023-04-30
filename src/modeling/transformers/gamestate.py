@@ -1,5 +1,5 @@
 """
-Houses all transformers used in the feature/column transformer pipeline
+Houses game state transformers used in the feature/column transformer pipeline
 """
 from datetime import datetime, date
 from typing import List

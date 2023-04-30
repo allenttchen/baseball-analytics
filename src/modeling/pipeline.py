@@ -1,10 +1,11 @@
 from datetime import date
+import os
 
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 
 from .preprocessors import ToDatetime
-from .transformers.transformers import (
+from .transformers.gamestate import (
     ComputeDaysSinceStart,
     ComputeNetScore,
     EncodeOnBaseOccupancy,
@@ -12,7 +13,8 @@ from .transformers.transformers import (
 )
 from .transformers.movingaverage import MovingAverage
 from .transformers.headtohead import HeadToHead
-from .constants import IDENTITY_COLS
+from .transformers.parkfactor import ParkFactor
+from .constants import IDENTITY_COLS, ROOT_DIR
 
 
 preprocessors = Pipeline(steps=[
@@ -101,7 +103,16 @@ feature_transformers = ColumnTransformer(
                 stats_to_compute=["1B", "2B", "HR", "BB", "SO", "PA", "wOBA"],
             ),
             ["batter", "pitcher", ]
-        )
+        ),
+        (
+            "ball_park",
+            ParkFactor(
+                output_cols=["1B", "2B", "3B", "HR", "BB"],
+                stats_to_compute=["1B", "2B", "3B", "HR", "BB"],
+                park_factors_file_path=os.path.join(ROOT_DIR, "intermediate/park_factors.csv"),
+            ),
+            ["home_team", ],
+        ),
     ],
     remainder='drop',
 )

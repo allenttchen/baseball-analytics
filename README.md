@@ -32,14 +32,18 @@ Model: Neural Network with Pytorch
 - Ballpark
   - Park factors for 1B, 2B, 3B, HR, BB
 - Game state
-  - Outs
-  - Innings
-  - Net Score
-  - 1B Occupied
-  - 2B Occupied
-  - 3B Occupied
-  - top/bottom of inning
-  - days since start of season
-  - temperature at game start time
+  - Outs [done]
+  - Innings [done]
+  - Net Score [done]
+  - 1B Occupied [done]
+  - 2B Occupied [done]
+  - 3B Occupied [done]
+  - top/bottom of inning [done]
+  - days since start of season [done]
+  - temperature at game start time [not available yet]
 - Batter fielding position
-  - batter's 9 main positions + DH
+  - batter's 9 main positions + DH 
+
+
+TODO:
+- Check Team abbreviations for every year
