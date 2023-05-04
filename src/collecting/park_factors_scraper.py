@@ -90,7 +90,7 @@ if __name__ == "__main__":
             for stat in stats_to_compute:
                 if stat not in park_factors_mapping[team]:
                     park_factors_mapping[team][stat] = {}
-                park_factors_mapping[team][stat][year] = row[stat]
+                park_factors_mapping[team][stat][year] = int(row[stat])
 
         # Impute missing values (some table in some years will have < 30 rows)
         missing_teams = all_abbre - set(df["team_abbre"])
@@ -103,7 +103,7 @@ if __name__ == "__main__":
                 park_factors_mapping[missing_team][stat][year] = 100
 
     # Save the dictionary into json
-    with open("../intermediate/park_factors.json", "w") as f:
+    with open("/src/modeling/intermediate/park_factors.json", "w") as f:
         park_factors_json = json.dumps(park_factors_mapping, indent=4)
         f.write(park_factors_json)
 

@@ -9,7 +9,8 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OrdinalEncoder
 
-from .._abstract_bases import TransformerBase
+from src.modeling._abstract_bases import TransformerBase
+from src.modeling.constants import SEASON_START_DATES
 
 
 class Identity(BaseEstimator, TransformerMixin, TransformerBase):
@@ -59,8 +60,8 @@ class ComputeNetScore(BaseEstimator, TransformerMixin, TransformerBase):
 class ComputeDaysSinceStart(BaseEstimator, TransformerMixin, TransformerBase):
     """Compute the number of days from game date to the start date of the season"""
 
-    def __init__(self, output_col: str, season_start_date: date):
-        self.season_start_date = season_start_date
+    def __init__(self, output_col: str):
+        self.season_start_dates = {k: datetime.strptime(v, "%Y-%m-%d").date() for k, v in SEASON_START_DATES.items()}
         self.input_col = None
         self.output_col = output_col
         self.feature_names_out = [output_col]
@@ -68,5 +69,36 @@ class ComputeDaysSinceStart(BaseEstimator, TransformerMixin, TransformerBase):
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         assert(len(X.columns.tolist()) == 1)
         self.input_col = X.columns.tolist()[0]
-        X[self.output_col] = X[self.input_col].apply(lambda x: (x.date() - self.season_start_date).days)
+        X[self.output_col] = X[self.input_col].apply(lambda x: (x.date() - self.season_start_dates[x.year]).days)
+        return X[[self.output_col]]
+
+
+class EncodeHandedness(BaseEstimator, TransformerMixin, TransformerBase):
+    """Turn batter/pitcher stand (left or right) into binary encoding"""
+
+    def __init__(self, output_cols: List[str]):
+        self.input_cols = None
+        self.output_cols = output_cols
+        self.feature_names_out = output_cols
+        self.handedness_mapping = {"R": 1, "L": 0}
+
+    def transform(self, X: pd.DataFrame):
+        self.input_cols = X.columns.tolist()
+        for input_col, output_col in zip(self.input_cols, self.output_cols):
+            X[output_col] = X[input_col].map(self.handedness_mapping)
+        return X[self.output_cols]
+
+
+class EncodeInningTopBot(BaseEstimator, TransformerMixin, TransformerBase):
+    """Turn inning top/bottom into binary encoding"""
+
+    def __init__(self, output_col: str):
+        self.input_col = None
+        self.output_col = output_col
+        self.feature_names_out = [output_col]
+        self.inningtopbot_mapping = {"Top": 1, "Bot": 0}
+
+    def transform(self, X: pd.DataFrame):
+        self.input_col = X.columns.tolist()[0]
+        X[self.output_col] = X[self.input_col].map(self.inningtopbot_mapping)
         return X[[self.output_col]]

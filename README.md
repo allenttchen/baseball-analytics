@@ -42,8 +42,14 @@ Model: Neural Network with Pytorch
   - days since start of season [done]
   - temperature at game start time [not available yet]
 - Batter fielding position
-  - batter's 9 main positions + DH 
+  - batter's 9 main positions + DH [TODO]
 
 
 TODO:
-- Check Team abbreviations for every year
+- Check Team abbreviations for every year [done]
+- Add logging
+- Time the transformers (preparation for below)
+- Scale the transformers with Spark pipeline
+- Offline model and feature selection in notebook
+- write script to scale to 20 years worth of data [in progress]
+- translate the pipeline running code from notebook to prod [done]

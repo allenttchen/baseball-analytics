@@ -1,3 +1,4 @@
+-e .
 pandas
 numpy
 matplotlib
@@ -7,3 +8,5 @@ ipykernel
 scikit-learn
 requests
 beautifulsoup4
+torch
+tqdm

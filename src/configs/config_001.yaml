@@ -1,0 +1,24 @@
+base:
+  random_state: 42
+
+preprocessing:
+  raw_data_dir: /Users/allenchen/projects/baseball-analytics/data/raw/
+  raw_data_filepath1: /Users/allenchen/projects/baseball-analytics/data/20230418_angels_batter_2023.csv
+  raw_data_filepath2: /Users/allenchen/projects/baseball-analytics/data/angels_batter_2022_season.csv
+  dataset_filepath: /Users/allenchen/projects/baseball-analytics/data/angels_2022-2023_features_and_targets_0.csv
+  raw_data_starting_date: "2022-04-07"
+
+splitting:
+  dataset_filepath: /Users/allenchen/projects/baseball-analytics/data/angels_2022-2023_features_and_targets_0.csv
+  train_filepath: /Users/allenchen/projects/baseball-analytics/data/train.csv
+  val_filepath: /Users/allenchen/projects/baseball-analytics/data/val.csv
+  test_size: 0.2
+
+training:
+  epochs: 10
+  batch_size: 32
+  lr: 0.001
+
+saving:
+  saved_metrics_filepath: /Users/allenchen/projects/baseball-analytics/results/metrics_001.json
+  saved_model_filepath: /Users/allenchen/projects/baseball-analytics/results/model_001.pt
