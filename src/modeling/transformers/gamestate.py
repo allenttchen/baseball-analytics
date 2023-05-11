@@ -11,6 +11,7 @@ from sklearn.preprocessing import OrdinalEncoder
 
 from src.modeling._abstract_bases import TransformerBase
 from src.modeling.constants import SEASON_START_DATES
+from src.modeling.utils import time_job
 
 
 class Identity(BaseEstimator, TransformerMixin, TransformerBase):
@@ -21,6 +22,7 @@ class Identity(BaseEstimator, TransformerMixin, TransformerBase):
         self.output_cols = None
         self.feature_names_out = None
 
+    @time_job
     def transform(self, X: pd.DataFrame):
         self.output_cols = X.columns.tolist()
         self.feature_names_out = self.output_cols
@@ -35,6 +37,7 @@ class EncodeOnBaseOccupancy(BaseEstimator, TransformerMixin, TransformerBase):
         self.output_cols = output_cols
         self.feature_names_out = output_cols
 
+    @time_job
     def transform(self, X: pd.DataFrame):
         self.input_cols = X.columns.tolist()
         for input_col, output_col in zip(self.input_cols, self.output_cols):
@@ -50,6 +53,7 @@ class ComputeNetScore(BaseEstimator, TransformerMixin, TransformerBase):
         self.output_col = output_col
         self.feature_names_out = [output_col]
 
+    @time_job
     def transform(self, X: pd.DataFrame):
         assert(len(X.columns.tolist()) == 2)
         self.input_cols = X.columns.tolist()
@@ -66,6 +70,7 @@ class ComputeDaysSinceStart(BaseEstimator, TransformerMixin, TransformerBase):
         self.output_col = output_col
         self.feature_names_out = [output_col]
 
+    @time_job
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         assert(len(X.columns.tolist()) == 1)
         self.input_col = X.columns.tolist()[0]
@@ -82,6 +87,7 @@ class EncodeHandedness(BaseEstimator, TransformerMixin, TransformerBase):
         self.feature_names_out = output_cols
         self.handedness_mapping = {"R": 1, "L": 0}
 
+    @time_job
     def transform(self, X: pd.DataFrame):
         self.input_cols = X.columns.tolist()
         for input_col, output_col in zip(self.input_cols, self.output_cols):
@@ -98,6 +104,7 @@ class EncodeInningTopBot(BaseEstimator, TransformerMixin, TransformerBase):
         self.feature_names_out = [output_col]
         self.inningtopbot_mapping = {"Top": 1, "Bot": 0}
 
+    @time_job
     def transform(self, X: pd.DataFrame):
         self.input_col = X.columns.tolist()[0]
         X[self.output_col] = X[self.input_col].map(self.inningtopbot_mapping)

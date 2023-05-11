@@ -20,18 +20,8 @@ def preprocess(config_filepath: str):
     config = read_params(config_filepath)
     preprocessing_config = config["preprocessing"]
 
-    # Aggregate
-    data_2023 = pd.read_csv(preprocessing_config["raw_data_filepath1"])
-    data_2022 = pd.read_csv(preprocessing_config["raw_data_filepath2"])
-    data = pd.concat([data_2022, data_2023])
-
-    # pre-cleaning
-    data = data[NEEDED_COLS]
-    data = data[data["events"].notnull()]
-    events_mapping = defaultdict(lambda: "delete", EVENTS_CLEANING_MAP)
-    data["events"] = data["events"].map(events_mapping)
-    data.drop(data[data["events"] == "delete"].index, inplace=True)
-    data.reset_index(drop=True, inplace=True)
+    # Load prepared data
+    data = pd.read_csv(preprocessing_config["raw_data_filepath"])
 
     # preprocessing with data pipeline
     cols = [col for col in data.columns if col != "events"]

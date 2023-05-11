@@ -27,6 +27,8 @@ NEEDED_COLS = [
     'inning',
     'inning_topbot',
     'launch_speed',
+    'at_bat_number',
+    'pitch_number',
     'game_pk',
     'bat_score',
     'fld_score',

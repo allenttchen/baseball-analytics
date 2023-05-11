@@ -11,6 +11,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 from src.modeling._abstract_bases import TransformerBase
 from src.modeling.constants import STATS_TO_EVENTS, ROOT_DIR, UNIQUE_RUN_ID, WOBA_FACTORS
+from src.modeling.utils import time_job
 
 
 class HeadToHead(BaseEstimator, TransformerMixin, TransformerBase):
@@ -23,6 +24,7 @@ class HeadToHead(BaseEstimator, TransformerMixin, TransformerBase):
         self.saved_file_name = None
         self.feature_names_out = output_cols
 
+    @time_job
     def fit(self, X: pd.DataFrame, y: pd.Series = None):
         """compute the resulting event statistics for every past batter and pitcher matchup"""
         self.input_cols = X.columns.tolist()
@@ -104,6 +106,7 @@ class HeadToHead(BaseEstimator, TransformerMixin, TransformerBase):
             f.write(matchup_stat_json)
         return self
 
+    @time_job
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Retrieve the matchup rate for each stat-to-compute"""
         if self.matchup_stat_mapping is None:

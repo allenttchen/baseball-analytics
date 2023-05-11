@@ -62,9 +62,9 @@ feature_transformers = ColumnTransformer(
                 player_type="batter",
                 ma_days=365,
                 stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV", "pwOBA", "pPA"],
-                training_data_start_date=date(2022, 4, 7),
-                training_data_end_date=date(2023, 4, 17),
-                ma_start_date=date(2023, 4, 7), # datetime(2022, 4, 7) + timedelta(365)
+                training_data_start_date=date(2008, 2, 27),
+                training_data_end_date=date(2023, 5, 3),
+                ma_start_date=date(2009, 2, 26), # datetime(2022, 4, 7) + timedelta(365)
             ),
             ["game_date", "batter", "launch_speed", "p_throws", ],
         ),
@@ -75,9 +75,9 @@ feature_transformers = ColumnTransformer(
                 player_type="pitcher",
                 ma_days=365,
                 stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV", "pwOBA", "pPA"],
-                training_data_start_date=date(2022, 4, 7),
-                training_data_end_date=date(2023, 4, 17),
-                ma_start_date=date(2023, 4, 7), # datetime(2022, 4, 7) + timedelta(365)
+                training_data_start_date=date(2008, 2, 27),
+                training_data_end_date=date(2023, 5, 3),
+                ma_start_date=date(2009, 2, 26), # datetime(2022, 4, 7) + timedelta(365)
             ),
             ["game_date", "pitcher", "launch_speed", "stand", ],
         ),
@@ -88,9 +88,9 @@ feature_transformers = ColumnTransformer(
                 player_type="batter",
                 ma_days=30,
                 stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"],
-                training_data_start_date=date(2022, 4, 7),
-                training_data_end_date=date(2023, 4, 17),
-                ma_start_date=date(2022, 5, 7), # datetime(2022, 4, 7) + timedelta(30)
+                training_data_start_date=date(2008, 2, 27),
+                training_data_end_date=date(2023, 5, 3),
+                ma_start_date=date(2008, 3, 28), # datetime(2022, 4, 7) + timedelta(30)
             ),
             ["game_date", "batter", "launch_speed", "p_throws", ],
         ),
@@ -101,9 +101,9 @@ feature_transformers = ColumnTransformer(
                 player_type="pitcher",
                 ma_days=30,
                 stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"],
-                training_data_start_date=date(2022, 4, 7),
-                training_data_end_date=date(2023, 4, 17),
-                ma_start_date=date(2022, 5, 7), # datetime(2022, 4, 7) + timedelta(30)
+                training_data_start_date=date(2008, 2, 27),
+                training_data_end_date=date(2023, 5, 3),
+                ma_start_date=date(2008, 3, 28), # datetime(2022, 4, 7) + timedelta(30)
             ),
             ["game_date", "pitcher", "launch_speed", "stand", ],
         ),

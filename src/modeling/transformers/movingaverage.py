@@ -3,12 +3,15 @@ from typing import List
 import functools
 import os
 import glob
+import concurrent.futures
 
+from tqdm import tqdm
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from src.modeling._abstract_bases import TransformerBase
 from src.modeling.constants import STATS_TO_EVENTS, ROOT_DIR, WOBA_FACTORS, UNIQUE_RUN_ID
+from src.modeling.utils import time_job
 
 
 class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
@@ -38,6 +41,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
         self.opp_player_type_handedness_col = None
         self.saved_file_name = None
 
+    @time_job
     def fit(self, X: pd.DataFrame, y: pd.Series = None):
         """Computes moving average for all players' all stats starting from mv_start_date to today"""
         self.input_cols = X.columns.tolist()
@@ -51,11 +55,35 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
             axis=1,
         )
 
-        self.ma_stats_df = (
-            data
-            .groupby([self.player_type])[["game_date", "events", "launch_speed", self.opp_player_type_handedness_col]]
-            .apply(self._compute_player_ma)
-        )
+        # self.ma_stats_df = (
+        #     data
+        #     .groupby([self.player_type])[["game_date", "events", "launch_speed", self.opp_player_type_handedness_col]]
+        #     .apply(self._compute_player_ma)
+        # )
+
+        # split data into multiple dataframes
+        df_by_players = dict(tuple(
+            data.groupby(
+                [self.player_type]
+            )[["game_date", "events", "launch_speed", self.opp_player_type_handedness_col]]
+        ))
+
+        ma_stats_dict = {}
+        with tqdm(total=len(df_by_players)) as progress:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:
+                futures_to_id = {
+                    executor.submit(self._compute_player_ma, player_df): player_id
+                    for player_id, player_df in df_by_players.items()
+                }
+                for future in concurrent.futures.as_completed(futures_to_id):
+                    player_id = futures_to_id[future]
+                    ma_stats_dict[player_id] = future.result()
+                    progress.update(1)
+
+        if ma_stats_dict:
+            self.ma_stats_df = pd.DataFrame.from_dict(ma_stats_dict, orient="index")
+        else:
+            self.ma_stats_df = pd.DataFrame()
 
         # saving as json file
         # {
@@ -68,6 +96,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
         self.ma_stats_df.to_json(intermediate_path_file, orient="index", indent=4)
         return self
 
+    @time_job
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Retrieve moving average for each requested stat"""
         if self.ma_stats_df.empty:
@@ -141,7 +170,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
                 player_event_group["stat_count"] = 1
                 stat_ma = self._compute_player_event_ma(player_event_group, t_index, self.pa_ts)
 
-            # check computed vs inputed moving average start date
+            # check computed vs input moving average start date
             computed_ma_start_date = stat_ma.index[self.ma_days]
             assert (computed_ma_start_date.date() == self.ma_start_date)
             stat_ma_lst = stat_ma.tolist()[self.ma_days:]
@@ -157,7 +186,8 @@ class MovingAverage(BaseEstimator, TransformerMixin, TransformerBase):
                 del player_event_group2
                 del player_group1
                 del player_group2
-        return pd.Series(stat_ma_mapping, index=stat_ma_mapping.keys())
+        #return pd.Series(stat_ma_mapping, index=stat_ma_mapping.keys())
+        return stat_ma_mapping
 
     def _compute_player_pa_ma(self, player_group, t_index):
         player_group["pa_count"] = 1.0

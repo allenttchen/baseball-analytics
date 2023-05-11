@@ -7,6 +7,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from src.modeling._abstract_bases import TransformerBase
+from src.modeling.utils import time_job
 
 
 class ParkFactor(BaseEstimator, TransformerMixin, TransformerBase):
@@ -20,9 +21,11 @@ class ParkFactor(BaseEstimator, TransformerMixin, TransformerBase):
         self.feature_names_out = output_cols
         self.park_factors_mapping = None
 
+    @time_job
     def fit(self, X: pd.DataFrame, y: pd.Series = None):
         return self
 
+    @time_job
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         self.input_cols = X.columns.tolist()
         with open(self.park_factors_file_path, "r") as f:

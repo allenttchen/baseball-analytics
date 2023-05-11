@@ -47,9 +47,11 @@ Model: Neural Network with Pytorch
 
 TODO:
 - Check Team abbreviations for every year [done]
-- Add logging
-- Time the transformers (preparation for below)
-- Scale the transformers with Spark pipeline
-- Offline model and feature selection in notebook
-- write script to scale to 20 years worth of data [in progress]
+- Add logging 
+- Time the transformers (preparation for below) [done]
+- Scale the transformers by parallelizing jobs
+  - concurrent futures [done]
+  - Spark pipeline on databrick 
+- Offline model and feature selection in notebook 
+- write script to scale to 20 years worth of data [done]
 - translate the pipeline running code from notebook to prod [done]
