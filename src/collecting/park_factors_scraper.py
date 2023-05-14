@@ -18,7 +18,7 @@ club_name_to_abbre_mapping = {
     'Athletics': "OAK",
     'Rays': "TB",
     'Blue Jays': "TOR",
-    'D-backs': "ARI",
+    'D-backs': "AZ",
     'Cubs': "CHC",
     'Rockies': "COL",
     'Dodgers': "LAD",

@@ -52,6 +52,9 @@ TODO:
 - Scale the transformers by parallelizing jobs
   - concurrent futures [done]
   - Spark pipeline on databrick 
+    - setup Spark locally 
+    - Build Spark pipeline
 - Offline model and feature selection in notebook 
 - write script to scale to 20 years worth of data [done]
 - translate the pipeline running code from notebook to prod [done]
+

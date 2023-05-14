@@ -41,7 +41,7 @@ class EncodeOnBaseOccupancy(BaseEstimator, TransformerMixin, TransformerBase):
     def transform(self, X: pd.DataFrame):
         self.input_cols = X.columns.tolist()
         for input_col, output_col in zip(self.input_cols, self.output_cols):
-            X[output_col] = np.where(X[input_col].notnull(), 1, 0)
+            X[output_col] = np.where(X[input_col] != 0, 1, 0)
         return X[self.output_cols]
 
 

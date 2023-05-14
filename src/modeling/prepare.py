@@ -24,9 +24,11 @@ def prepare(raw_data_dir: str, seasons: List[int], teams: List[str], agg_raw_dat
                 progress.update(1)
     if dfs:
         aggregated_df = pd.concat(dfs, axis=0)
-        aggregated_df = aggregated_df.sort_values(
-            ['game_date', 'game_pk', 'at_bat_number', 'pitch_number'],
-            ascending=False
+        aggregated_df[["on_3b", "on_2b", "on_1b"]] = aggregated_df[["on_3b", "on_2b", "on_1b"]].fillna(0)
+        aggregated_df = (
+            aggregated_df
+            .sort_values(['game_date', 'game_pk', 'at_bat_number', 'pitch_number'], ascending=False)
+            .astype({"batter": str, "pitcher": str, "on_3b": int, "on_2b": int, "on_1b": int, "game_pk": str})
         )
         aggregated_df.reset_index(drop=True, inplace=True)
     else:
@@ -51,12 +53,14 @@ def _pre_clean_job(season_team_filepath):
 
 if __name__ == "__main__":
     raw_data_dir = "/Users/allenchen/projects/baseball-analytics/data/raw"
-    seasons = list(range(2008, 2024))
-    teams = ["LAA", "HOU", "OAK", "TOR", "ATL", "MIL", "STL",
-             "CHC", "ARI", "LAD", "SF", "CLE", "SEA", "MIA",
-             "NYM", "WSH", "BAL", "SD", "PHI", "PIT", "TEX",
-             "TB", "BOS", "CIN", "COL", "KC", "DET", "MIN", "CWS", "NYY"]
-    agg_raw_data_filepath = "/Users/allenchen/projects/baseball-analytics/data/aggregated/20230504_agg_raw_data.csv"
+    #seasons = list(range(2008, 2024))
+    seasons = list(range(2022, 2024))
+    # teams = ["LAA", "HOU", "OAK", "TOR", "ATL", "MIL", "STL",
+    #          "CHC", "AZ", "LAD", "SF", "CLE", "SEA", "MIA",
+    #          "NYM", "WSH", "BAL", "SD", "PHI", "PIT", "TEX",
+    #          "TB", "BOS", "CIN", "COL", "KC", "DET", "MIN", "CWS", "NYY"]
+    teams = ["LAA"]
+    agg_raw_data_filepath = "/Users/allenchen/projects/baseball-analytics/data/aggregated/20230504_agg_raw_data_small.csv"
     _ = prepare(
         raw_data_dir=raw_data_dir,
         seasons=seasons,

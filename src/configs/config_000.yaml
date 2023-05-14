@@ -4,14 +4,14 @@ base:
 preprocessing:
   raw_data_dir: /Users/allenchen/projects/baseball-analytics/data/raw/
   agg_data_filepath: /Users/allenchen/projects/baseball-analytics/data/aggregated/20230504_agg_raw_data_small.csv
-  dataset_filepath: /Users/allenchen/projects/baseball-analytics/data/training/20230504_features_and_targets_spark_small.csv
+  dataset_filepath: /Users/allenchen/projects/baseball-analytics/data/training/20230504_features_and_targets_small.csv
   training_data_start_date: "2022-03-18"
   training_data_end_date: "2023-05-03"
 
 splitting:
-  dataset_filepath: /Users/allenchen/projects/baseball-analytics/data/training/20230504_features_and_targets_spark_small.csv
-  train_filepath: /Users/allenchen/projects/baseball-analytics/data/training/20230504_train_spark_small.csv
-  val_filepath: /Users/allenchen/projects/baseball-analytics/data/training/20230504_val_spark_small.csv
+  dataset_filepath: /Users/allenchen/projects/baseball-analytics/data/training/20230504_features_and_targets_small.csv
+  train_filepath: /Users/allenchen/projects/baseball-analytics/data/training/20230504_train_small.csv
+  val_filepath: /Users/allenchen/projects/baseball-analytics/data/training/20230504_val_small.csv
   test_size: 0.2
 
 training:

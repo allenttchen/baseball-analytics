@@ -65,7 +65,7 @@ if __name__ == "__main__":
     download(
         seasons=list(range(2008, 2024)),
         teams=['LAA', 'HOU', 'OAK', 'TOR', 'ATL', 'MIL', 'STL',
-               'CHC', 'ARI', 'LAD', 'SF', 'CLE', 'SEA', 'MIA',
+               'CHC', 'AZ', 'LAD', 'SF', 'CLE', 'SEA', 'MIA',
                'NYM', 'WSH', 'BAL', 'SD', 'PHI', 'PIT', 'TEX',
                'TB', 'BOS', 'CIN', 'COL', 'KC', 'DET', 'MIN', 'CWS', 'NYY'],
         saved_dir="/Users/allenchen/projects/baseball-analytics/data/raw"
