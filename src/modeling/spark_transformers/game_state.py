@@ -1,4 +1,5 @@
 from itertools import chain
+from typing import List
 
 from pyspark.ml import Transformer
 from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable
@@ -9,6 +10,7 @@ from pyspark.sql.functions import (
     year, to_date,
     datediff,
     when,
+    to_timestamp,
 )
 from pyspark.sql import DataFrame
 
@@ -16,10 +18,40 @@ from src.modeling.utils import time_job
 from src.modeling.constants import SEASON_START_DATES
 
 
+class GetOutputColsMixin:
+    def get_output_cols(self) -> List[str]:
+        if hasattr(self, "outputCol"):
+            return [self.outputCol]
+        elif hasattr(self, "outputCols"):
+            return self.outputCols
+        else:
+            return []
+
+
+class ConvertToDatetime(
+    Transformer,
+    DefaultParamsReadable,
+    DefaultParamsWritable,
+    GetOutputColsMixin,
+):
+    def __init__(self, inputCol=None, outputCol=None):
+        super(ConvertToDatetime, self).__init__()
+        self.inputCol = inputCol
+        self.outputCol = outputCol
+
+    def _transform(self, dataset: DataFrame) -> DataFrame:
+        dataset = dataset.withColumn(
+            self.outputCol,
+            to_timestamp(col(self.inputCol), "yyyy-MM-dd")
+        )
+        return dataset
+
+
 class EncodeOnBaseOccupancy(
     Transformer,
     DefaultParamsReadable,
     DefaultParamsWritable,
+    GetOutputColsMixin,
 ):
 
     def __init__(self, inputCols=None, outputCols=None):
@@ -41,6 +73,7 @@ class ComputeNetScore(
     Transformer,
     DefaultParamsReadable,
     DefaultParamsWritable,
+    GetOutputColsMixin,
 ):
     def __init__(self, inputCols=None, outputCol=None):
         super(ComputeNetScore, self).__init__()
@@ -60,6 +93,7 @@ class ComputeDaysSinceStart(
     Transformer,
     DefaultParamsReadable,
     DefaultParamsWritable,
+    GetOutputColsMixin,
 ):
     def __init__(self, inputCol=None, outputCol=None):
         super(ComputeDaysSinceStart, self).__init__()
@@ -72,7 +106,7 @@ class ComputeDaysSinceStart(
         dataset = dataset.withColumn(
             self.outputCol,
             datediff(
-                to_date(col(self.inputCol), "yyyy-MM-dd"),
+                to_date(col(self.inputCol)),
                 to_date(self.season_start_dates[year(col(self.inputCol))], "yyyy-MM-dd"),
             )
         )
@@ -83,6 +117,7 @@ class EncodeHandedness(
     Transformer,
     DefaultParamsReadable,
     DefaultParamsWritable,
+    GetOutputColsMixin,
 ):
     def __init__(self, inputCols=None, outputCols=None):
         super(EncodeHandedness, self).__init__()
@@ -104,6 +139,7 @@ class EncodeInningTopBot(
     Transformer,
     DefaultParamsReadable,
     DefaultParamsWritable,
+    GetOutputColsMixin,
 ):
     def __init__(self, inputCol=None, outputCol=None):
         super(EncodeInningTopBot, self).__init__()

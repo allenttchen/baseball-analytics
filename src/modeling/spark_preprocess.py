@@ -5,17 +5,19 @@ import pandas as pd
 import numpy as np
 from utils import read_params
 from constants import NEEDED_COLS, EVENTS_CLEANING_MAP, EVENTS_CATEGORIES
-from pyspark.sql.functions import col, pandas_udf, PandasUDFType
+from pyspark.sql.functions import col, pandas_udf, PandasUDFType, date_format
 from pyspark.sql.types import *
 from pyspark.sql import SparkSession
 from pyspark.ml import Pipeline, PipelineModel
 from src.modeling.spark_transformers.game_state import (
+    ConvertToDatetime,
     EncodeOnBaseOccupancy,
     ComputeNetScore,
     ComputeDaysSinceStart,
     EncodeHandedness,
     EncodeInningTopBot,
 )
+from src.modeling.spark_transformers.movingaverage import MovingAverageEstimator, MovingAverageTransformer
 
 
 def preprocess(config_filepath: str):
@@ -34,6 +36,7 @@ def preprocess(config_filepath: str):
         .builder
         .master("local[12]")
         .appName("baseball-analytics")
+        .config("spark.sql.debug.maxToStringFields", 1000)
         .getOrCreate()
     )
 
@@ -76,11 +79,15 @@ def preprocess(config_filepath: str):
     )
 
     # preprocessing with data pipeline
-    cols = [column for column in data.columns if column != "events"]
-    X, y = data.select(*cols), data.select(col("events"))
+    #cols = [column for column in data.columns if column != "events"]
+    #X, y = data.select(*cols), data.select(col("events"))
 
-    data_pipeline = PipelineModel(
+    data_pipeline = Pipeline(
         stages=[
+            ConvertToDatetime(
+                inputCol="game_date",
+                outputCol="game_date",
+            ),
             EncodeOnBaseOccupancy(
                 inputCols=["on_3b", "on_2b", "on_1b"],
                 outputCols=["on_3b", "on_2b", "on_1b"],
@@ -101,26 +108,73 @@ def preprocess(config_filepath: str):
                 inputCol="inning_topbot",
                 outputCol="topbot",
             ),
+            # batter_365_days_ma_
+            MovingAverageEstimator(
+                inputCols=["events", "game_date", "batter", "launch_speed", "p_throws", ],
+                outputCols=["batter_365_days_ma_"+stat for stat in ["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV", "pwOBA", "pPA"]],
+                player_type="batter",
+                ma_days=365,
+                stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA",
+                                  "mEV", "aEV", "pwOBA", "pPA"],
+                training_data_start_date=training_data_start_date,  # date(2008, 2, 27),
+                training_data_end_date=training_data_end_date,  # date(2023, 5, 3),
+                ma_start_date=ma365_start_date.date(),  # date(2009, 2, 26), # datetime(2022, 4, 7) + timedelta(365)
+            ),
+            # # pitcher_365_days_ma_
+            # MovingAverageEstimator(
+            #     inputCols=["events", "game_date", "pitcher", "launch_speed", "stand", ],
+            #     outputCols=["pitcher_365_days_ma_"+stat for stat in ["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV", "pwOBA", "pPA"]],
+            #     player_type="pitcher",
+            #     ma_days=365,
+            #     stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA",
+            #                       "mEV", "aEV", "pwOBA", "pPA"],
+            #     training_data_start_date=training_data_start_date,
+            #     training_data_end_date=training_data_end_date,
+            #     ma_start_date=ma365_start_date.date(),
+            # ),
+            # # batter_30_days_ma_
+            # MovingAverageEstimator(
+            #     inputCols=["events", "game_date", "batter", "launch_speed", "p_throws", ],
+            #     outputCols=["batter_30_days_ma_"+stat for stat in ["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"]],
+            #     player_type="batter",
+            #     ma_days=30,
+            #     stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"],
+            #     training_data_start_date=training_data_start_date,
+            #     training_data_end_date=training_data_end_date,
+            #     ma_start_date=ma30_start_date.date(),
+            # ),
+            # head_to_head_ma_
+            # ball_park_
         ]
     )
 
-    Xt = data_pipeline.transform(X)
-    Xt.show()
-    # transformed_feature_col_names = data_pipeline["feature_transformers"].get_feature_names_out().tolist()
-    # features = pd.DataFrame(Xt, columns=transformed_feature_col_names)
-    # features_and_events = pd.concat([features, pd.Series(y, name="events")], axis=1)
-    #
-    # # post-cleaning
-    # features_and_events = features_and_events[features_and_events["identity__game_date"] >= ma365_start_date]
-    # features_and_events = (
-    #     features_and_events
-    #     .reset_index(drop=True)
-    #     .drop(["identity__game_date"], axis=1)
-    # )
-    # features_and_events["events"] = features_and_events["events"].apply(lambda x: EVENTS_CATEGORIES.index(x))
-    #
-    # # save features and events
-    # features_and_events.to_csv(preprocessing_config["dataset_filepath"], index=False)
+    pipelinemodel = data_pipeline.fit(data)
+    features_and_events = pipelinemodel.transform(data)
+
+    # get all output columns
+    output_cols = ['events', 'outs_when_up', 'inning', ]
+    for stage in pipelinemodel.stages:
+        output_cols.extend(stage.get_output_cols())
+
+    features_and_events = features_and_events.select(*output_cols)
+    features_and_events = features_and_events.withColumn(
+        "game_date",
+        date_format(col("game_date"), "yyyy-MM-dd HH:mm:ss")
+    )
+    features_and_events = features_and_events.toPandas()
+
+    # post-cleaning
+    features_and_events["game_date"] = pd.to_datetime(features_and_events["game_date"])
+    features_and_events = features_and_events[features_and_events["game_date"] >= ma365_start_date]
+    features_and_events = (
+        features_and_events
+        .reset_index(drop=True)
+        .drop(["game_date"], axis=1)
+    )
+    features_and_events["events"] = features_and_events["events"].apply(lambda x: EVENTS_CATEGORIES.index(x))
+
+    # save features and events
+    features_and_events.to_csv(preprocessing_config["dataset_filepath"], index=False)
 
 
 if __name__ == "__main__":

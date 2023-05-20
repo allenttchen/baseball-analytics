@@ -13,3 +13,4 @@ tqdm
 backoff
 structlog
 pyspark
+PyArrow
