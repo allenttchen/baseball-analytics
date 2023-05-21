@@ -120,29 +120,29 @@ def preprocess(config_filepath: str):
                 training_data_end_date=training_data_end_date,  # date(2023, 5, 3),
                 ma_start_date=ma365_start_date.date(),  # date(2009, 2, 26), # datetime(2022, 4, 7) + timedelta(365)
             ),
-            # # pitcher_365_days_ma_
-            # MovingAverageEstimator(
-            #     inputCols=["events", "game_date", "pitcher", "launch_speed", "stand", ],
-            #     outputCols=["pitcher_365_days_ma_"+stat for stat in ["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV", "pwOBA", "pPA"]],
-            #     player_type="pitcher",
-            #     ma_days=365,
-            #     stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA",
-            #                       "mEV", "aEV", "pwOBA", "pPA"],
-            #     training_data_start_date=training_data_start_date,
-            #     training_data_end_date=training_data_end_date,
-            #     ma_start_date=ma365_start_date.date(),
-            # ),
-            # # batter_30_days_ma_
-            # MovingAverageEstimator(
-            #     inputCols=["events", "game_date", "batter", "launch_speed", "p_throws", ],
-            #     outputCols=["batter_30_days_ma_"+stat for stat in ["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"]],
-            #     player_type="batter",
-            #     ma_days=30,
-            #     stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"],
-            #     training_data_start_date=training_data_start_date,
-            #     training_data_end_date=training_data_end_date,
-            #     ma_start_date=ma30_start_date.date(),
-            # ),
+            # pitcher_365_days_ma_
+            MovingAverageEstimator(
+                inputCols=["events", "game_date", "pitcher", "launch_speed", "stand", ],
+                outputCols=["pitcher_365_days_ma_"+stat for stat in ["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA", "mEV", "aEV", "pwOBA", "pPA"]],
+                player_type="pitcher",
+                ma_days=365,
+                stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "DP", "FO", "HBP", "SF", "SH", "wOBA",
+                                  "mEV", "aEV", "pwOBA", "pPA"],
+                training_data_start_date=training_data_start_date,
+                training_data_end_date=training_data_end_date,
+                ma_start_date=ma365_start_date.date(),
+            ),
+            # batter_30_days_ma_
+            MovingAverageEstimator(
+                inputCols=["events", "game_date", "batter", "launch_speed", "p_throws", ],
+                outputCols=["batter_30_days_ma_"+stat for stat in ["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"]],
+                player_type="batter",
+                ma_days=30,
+                stats_to_compute=["PA", "1B", "2B", "3B", "HR", "BB", "SO", "wOBA"],
+                training_data_start_date=training_data_start_date,
+                training_data_end_date=training_data_end_date,
+                ma_start_date=ma30_start_date.date(),
+            ),
             # head_to_head_ma_
             # ball_park_
         ]

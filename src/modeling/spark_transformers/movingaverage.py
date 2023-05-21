@@ -128,16 +128,18 @@ class MovingAverageEstimator(
         else:
             self.opp_player_type_handedness_col = "stand"
 
-        # Returned Player MA DF schema
-        player_ma_schema = StructType(
+        player_ma_schema_lst = (
             [StructField(self.player_type, StringType(), False)] +
-            [StructField(col_name, ArrayType(FloatType()), False) for col_name in self.stats_to_compute] +
-            # Factor in the extra 2 columns for platoon features ("pwOBA", "pPA")
-            [
-                StructField('RpwOBA', ArrayType(FloatType()), False),
-                StructField('RpPA', ArrayType(FloatType()), False),
-            ]
+            [StructField(col_name, ArrayType(FloatType()), False) for col_name in self.stats_to_compute]
         )
+        # Factor in the extra 2 columns for platoon features ("pwOBA", "pPA")
+        if "pwOBA" in self.stats_to_compute:
+            player_ma_schema_lst.append(StructField('RpwOBA', ArrayType(FloatType()), False))
+        if "pPA" in self.stats_to_compute:
+            player_ma_schema_lst.append(StructField('RpPA', ArrayType(FloatType()), False))
+
+        # Returned Player MA DF schema
+        player_ma_schema = StructType(player_ma_schema_lst)
 
         player_ma_udf = pandas_udf(
             f=functools.partial(MovingAverageEstimator._compute_player_ma, self),
